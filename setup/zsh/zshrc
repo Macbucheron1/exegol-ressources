@@ -2,3 +2,52 @@
 # This file is sourced in /root/.zshrc file.
 # Alternatively, the /opt/my-resources/setup/load_user_setup.sh file can be used to operate the change once (instead of sourcing a file for each zsh instance)
 
+# Active le mode vi dans zsh
+bindkey -v
+
+# Curseur:
+#   insert  -> barre verticale stable
+#   normal  -> bloc stable
+# Séquences DECSCUSR, supportées par beaucoup de terminaux modernes
+function _zsh_vi_cursor_update() {
+  case ${KEYMAP} in
+    vicmd)
+      printf '\e[2 q'   # bloc stable
+      ;;
+    viins|main|"")
+      printf '\e[6 q'   # barre verticale stable
+      ;;
+    *)
+      printf '\e[6 q'
+      ;;
+  esac
+}
+
+function zle-keymap-select {
+  _zsh_vi_cursor_update
+  zle reset-prompt
+}
+zle -N zle-keymap-select
+
+function zle-line-init {
+  _zsh_vi_cursor_update
+  zle reset-prompt
+}
+zle -N zle-line-init
+
+function zle-line-finish {
+  printf '\e[6 q'       # remet une barre en quittant l'édition
+}
+zle -N zle-line-finish
+
+# Indicateur visuel en plus du curseur dans le prompt
+function _zsh_vi_mode_prompt() {
+  if [[ ${KEYMAP} == vicmd ]]; then
+    echo '[N]'
+  else
+    echo '[I]'
+  fi
+}
+
+setopt PROMPT_SUBST
+PROMPT='%F{blue}%f %n %F{cyan}%~%f %F{yellow}$(_zsh_vi_mode_prompt)%f %# '
