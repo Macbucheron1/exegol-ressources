@@ -40,14 +40,4 @@ function zle-line-finish {
 }
 zle -N zle-line-finish
 
-# Indicateur visuel en plus du curseur dans le prompt
-function _zsh_vi_mode_prompt() {
-  if [[ ${KEYMAP} == vicmd ]]; then
-    echo '[N]'
-  else
-    echo '[I]'
-  fi
-}
-
 setopt PROMPT_SUBST
-PROMPT='%F{blue}%f %n %F{cyan}%~%f %F{yellow}$(_zsh_vi_mode_prompt)%f %# '
